@@ -40,4 +40,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+// Converter Gson (để chuyển đổi JSON sang Java Object)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
