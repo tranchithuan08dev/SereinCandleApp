@@ -3,6 +3,7 @@ package com.example.sereincandle.network;
 import com.example.sereincandle.LoginRequest;
 import com.example.sereincandle.LoginResponse;
 import com.example.sereincandle.models.CartItemRequest;
+import com.example.sereincandle.models.CartResponse;
 import com.example.sereincandle.models.ProductDetailResponse;
 import com.example.sereincandle.models.ProductListResponse;
 
@@ -29,4 +30,6 @@ public interface ApiService {
 
     @POST("carts/items")
     Call<Void> addItemToCart(@Body CartItemRequest request);
+    @GET("carts")
+    Call<CartResponse> getCart();
 }

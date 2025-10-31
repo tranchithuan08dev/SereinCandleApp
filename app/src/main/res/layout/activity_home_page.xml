@@ -16,13 +16,29 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"/>
 
-    <Button
-        android:id="@+id/btnViewProducts"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Xem Danh Sách Sản Phẩm"
+        android:orientation="vertical"
         android:layout_centerInParent="true"
-        android:padding="15dp"
-        android:textSize="18sp"/>
+        android:gravity="center">
 
+        <Button
+            android:id="@+id/btnViewProducts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xem Danh Sách Sản Phẩm"
+            android:padding="15dp"
+            android:textSize="18sp"
+            android:layout_marginBottom="20dp"/>
+
+        <Button
+            android:id="@+id/btnViewCart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xem Giỏ Hàng"
+            android:padding="15dp"
+            android:textSize="18sp" />
+
+    </LinearLayout>
 </RelativeLayout>
