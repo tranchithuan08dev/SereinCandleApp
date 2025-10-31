@@ -24,13 +24,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CartActivity extends AppCompatActivity {
+// Triển khai interface xóa
+public class CartActivity extends AppCompatActivity
+        implements CartAdapter.OnRemoveItemClickListener {
 
     private RecyclerView rvCartItems;
     private TextView tvTotalAmount;
     private CartAdapter adapter;
     private List<CartItem> cartItemList;
-    // Sử dụng định dạng tiền tệ
     private final DecimalFormat formatter = new DecimalFormat("#,### VND");
 
     @Override
@@ -46,7 +47,8 @@ public class CartActivity extends AppCompatActivity {
         cartItemList = new ArrayList<>();
 
         // 2. Thiết lập RecyclerView
-        adapter = new CartAdapter(this, cartItemList);
+        // Truyền 'this' (listener xóa) vào Adapter
+        adapter = new CartAdapter(this, cartItemList, this);
         rvCartItems.setLayoutManager(new LinearLayoutManager(this));
         rvCartItems.setAdapter(adapter);
 
@@ -55,10 +57,47 @@ public class CartActivity extends AppCompatActivity {
     }
 
     /**
-     * Phương thức gọi API để lấy thông tin giỏ hàng (Yêu cầu Token Bearer)
+     * Phương thức triển khai từ OnRemoveItemClickListener (Xử lý khi nhấp nút Xóa)
+     * @param productId ID của sản phẩm cần xóa
+     */
+    @Override
+    public void onRemoveItemClick(int productId) {
+        deleteItemFromCart(productId);
+    }
+
+    private void deleteItemFromCart(int productId) {
+        ApiService apiService = ServiceGenerator.createService(ApiService.class);
+
+        // Gọi API DELETE bằng productId
+        Call<Void> call = apiService.deleteCartItem(productId);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(CartActivity.this, "Đã xóa sản phẩm khỏi giỏ hàng.", Toast.LENGTH_SHORT).show();
+                    // 💥 QUAN TRỌNG: Tải lại giỏ hàng để cập nhật giao diện
+                    fetchCart();
+                } else if (response.code() == 401) {
+                    Toast.makeText(CartActivity.this, "Lỗi: Vui lòng đăng nhập lại (Token hết hạn).", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(CartActivity.this, "Lỗi xóa giỏ hàng: Mã " + response.code(), Toast.LENGTH_LONG).show();
+                    Log.e("CART_DELETE_ERROR", "Phản hồi lỗi: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(CartActivity.this, "Lỗi kết nối khi xóa: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+
+    /**
+     * Phương thức gọi API để lấy thông tin giỏ hàng
      */
     private void fetchCart() {
-        // ServiceGenerator tự động thêm Token Bearer
         ApiService apiService = ServiceGenerator.createService(ApiService.class);
         Call<CartResponse> call = apiService.getCart();
 
@@ -78,13 +117,11 @@ public class CartActivity extends AppCompatActivity {
                     }
 
                     Toast.makeText(CartActivity.this, "Tải giỏ hàng thành công!", Toast.LENGTH_SHORT).show();
-                } else if (response.code() == 401) {
-                    Toast.makeText(CartActivity.this, "Lỗi: Vui lòng đăng nhập lại (Token hết hạn).", Toast.LENGTH_LONG).show();
                 } else {
                     // Xử lý giỏ hàng trống hoặc lỗi khác
-                    Toast.makeText(CartActivity.this, "Giỏ hàng trống hoặc Lỗi: " + response.code(), Toast.LENGTH_LONG).show();
-                    // Đảm bảo tổng tiền là 0 nếu giỏ hàng trống hoặc lỗi
                     tvTotalAmount.setText(formatter.format(0));
+                    adapter.updateItems(new ArrayList<>()); // Xóa danh sách hiện tại
+                    Toast.makeText(CartActivity.this, "Giỏ hàng trống hoặc Lỗi: " + response.code(), Toast.LENGTH_LONG).show();
                     Log.e("CART_API_ERROR", "Lỗi phản hồi: " + response.code());
                 }
             }
@@ -92,6 +129,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<CartResponse> call, Throwable t) {
                 // Xử lý lỗi kết nối mạng
+                tvTotalAmount.setText(formatter.format(0));
                 Toast.makeText(CartActivity.this, "Lỗi kết nối mạng: " + t.getMessage(), Toast.LENGTH_LONG).show();
                 Log.e("CART_NETWORK_FAILURE", "Lỗi: " + t.getMessage(), t);
             }

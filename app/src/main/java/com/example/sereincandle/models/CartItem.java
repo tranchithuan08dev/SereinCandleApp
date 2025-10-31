@@ -18,6 +18,9 @@ public class CartItem {
     private String imageUrl;
 
     // Cần các Getter để hiển thị dữ liệu
+    public int getProductId() {
+        return productId;
+    }
     public String getProductName() { return productName; }
     public int getQuantity() { return quantity; }
     public double getPriceAtAdd() { return priceAtAdd; }

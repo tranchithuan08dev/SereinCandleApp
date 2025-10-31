@@ -9,6 +9,7 @@ import com.example.sereincandle.models.ProductListResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -32,4 +33,7 @@ public interface ApiService {
     Call<Void> addItemToCart(@Body CartItemRequest request);
     @GET("carts")
     Call<CartResponse> getCart();
+
+    @DELETE("carts/items/{itemId}")
+    Call<Void> deleteCartItem(@Path("itemId") int itemId);
 }

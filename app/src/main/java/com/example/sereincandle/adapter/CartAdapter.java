@@ -22,15 +22,22 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     private final Context context;
     private List<CartItem> cartItemList;
     private final DecimalFormat formatter = new DecimalFormat("#,### VND");
+    private final OnRemoveItemClickListener removeListener; // Listener xóa
 
-    // Nếu bạn muốn thêm chức năng Xóa/Cập nhật số lượng, bạn sẽ cần một Listener ở đây.
-
-    public CartAdapter(Context context, List<CartItem> cartItemList) {
-        this.context = context;
-        this.cartItemList = cartItemList;
+    /**
+     * Interface Listener: Xử lý khi nhấp vào nút Xóa mục.
+     * Phương thức nhận VÀ TRUYỀN VÀO productId (như yêu cầu API DELETE)
+     */
+    public interface OnRemoveItemClickListener {
+        void onRemoveItemClick(int productId); // <<< Sử dụng productId
     }
 
-    // Phương thức tiện ích để cập nhật danh sách (được gọi từ CartActivity)
+    public CartAdapter(Context context, List<CartItem> cartItemList, OnRemoveItemClickListener removeListener) {
+        this.context = context;
+        this.cartItemList = cartItemList;
+        this.removeListener = removeListener;
+    }
+
     public void updateItems(List<CartItem> newItems) {
         this.cartItemList = newItems;
         notifyDataSetChanged();
@@ -52,7 +59,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.tvPrice.setText(formatter.format(item.getPriceAtAdd()));
         holder.tvQuantity.setText(String.valueOf(item.getQuantity()));
 
-        // Tải ảnh bằng Glide
+        // Tải ảnh
         String imageUrl = item.getImageUrl();
         if (imageUrl != null) {
             Glide.with(context)
@@ -64,7 +71,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             holder.ivImage.setImageResource(R.mipmap.ic_launcher);
         }
 
-        // Thêm logic xử lý sự kiện cho btnRemoveCartItem nếu cần thiết
+        // Xử lý sự kiện nhấp nút Xóa
+        holder.btnRemove.setOnClickListener(v -> {
+            if (removeListener != null) {
+                // Truyền productId để gọi API DELETE
+                removeListener.onRemoveItemClick(item.getProductId());
+            }
+        });
     }
 
     @Override
