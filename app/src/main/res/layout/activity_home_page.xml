@@ -7,11 +7,22 @@
     tools:context=".HomePageActivity">
 
     <TextView
+        android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chào mừng! Bạn đã đăng nhập thành công."
+        android:text="Chào mừng đến với Trang Chủ!"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_centerInParent="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"/>
+
+    <Button
+        android:id="@+id/btnViewProducts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Xem Danh Sách Sản Phẩm"
+        android:layout_centerInParent="true"
+        android:padding="15dp"
+        android:textSize="18sp"/>
 
 </RelativeLayout>
