@@ -4,8 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button; // Thêm import cho Button
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ public class CartActivity extends AppCompatActivity
 
     private RecyclerView rvCartItems;
     private TextView tvTotalAmount;
+    private Button btnCheckout; // Khai báo Button
     private CartAdapter adapter;
     private List<CartItem> cartItemList;
     private final DecimalFormat formatter = new DecimalFormat("#,### VND");
@@ -42,6 +45,7 @@ public class CartActivity extends AppCompatActivity
         // 1. Ánh xạ
         rvCartItems = findViewById(R.id.rvCartItems);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
+        btnCheckout = findViewById(R.id.btnCheckout); // Ánh xạ Button
 
         // Khởi tạo danh sách
         cartItemList = new ArrayList<>();
@@ -52,8 +56,26 @@ public class CartActivity extends AppCompatActivity
         rvCartItems.setLayoutManager(new LinearLayoutManager(this));
         rvCartItems.setAdapter(adapter);
 
-        // 3. Tải dữ liệu giỏ hàng
+        // 3. Xử lý nút Đặt hàng
+        btnCheckout.setOnClickListener(v -> {
+            // Chỉ cho phép thanh toán nếu giỏ hàng không trống
+            if (!cartItemList.isEmpty()) {
+                startCheckout();
+            } else {
+                Toast.makeText(this, "Giỏ hàng của bạn đang trống!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // 4. Tải dữ liệu giỏ hàng
         fetchCart();
+    }
+
+    /**
+     * Chuyển sang màn hình thanh toán
+     */
+    private void startCheckout() {
+        Intent intent = new Intent(this, CheckoutActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -76,7 +98,7 @@ public class CartActivity extends AppCompatActivity
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(CartActivity.this, "Đã xóa sản phẩm khỏi giỏ hàng.", Toast.LENGTH_SHORT).show();
-                    // 💥 QUAN TRỌNG: Tải lại giỏ hàng để cập nhật giao diện
+                    // Tải lại giỏ hàng để cập nhật giao diện
                     fetchCart();
                 } else if (response.code() == 401) {
                     Toast.makeText(CartActivity.this, "Lỗi: Vui lòng đăng nhập lại (Token hết hạn).", Toast.LENGTH_LONG).show();
@@ -114,13 +136,15 @@ public class CartActivity extends AppCompatActivity
                     List<CartItem> items = cartResponse.getItems();
                     if (items != null) {
                         adapter.updateItems(items);
+                        cartItemList = items; // Cập nhật danh sách nội bộ cho nút Checkout
                     }
 
                     Toast.makeText(CartActivity.this, "Tải giỏ hàng thành công!", Toast.LENGTH_SHORT).show();
                 } else {
                     // Xử lý giỏ hàng trống hoặc lỗi khác
                     tvTotalAmount.setText(formatter.format(0));
-                    adapter.updateItems(new ArrayList<>()); // Xóa danh sách hiện tại
+                    adapter.updateItems(new ArrayList<>());
+                    cartItemList = new ArrayList<>(); // Cập nhật danh sách nội bộ
                     Toast.makeText(CartActivity.this, "Giỏ hàng trống hoặc Lỗi: " + response.code(), Toast.LENGTH_LONG).show();
                     Log.e("CART_API_ERROR", "Lỗi phản hồi: " + response.code());
                 }

@@ -4,6 +4,7 @@ import com.example.sereincandle.LoginRequest;
 import com.example.sereincandle.LoginResponse;
 import com.example.sereincandle.models.CartItemRequest;
 import com.example.sereincandle.models.CartResponse;
+import com.example.sereincandle.models.OrderRequest;
 import com.example.sereincandle.models.ProductDetailResponse;
 import com.example.sereincandle.models.ProductListResponse;
 
@@ -36,4 +37,6 @@ public interface ApiService {
 
     @DELETE("carts/items/{itemId}")
     Call<Void> deleteCartItem(@Path("itemId") int itemId);
+    @POST("Order")
+    Call<Void> placeOrder(@Body OrderRequest request);
 }
