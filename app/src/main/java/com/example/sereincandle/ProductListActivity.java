@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 // Đảm bảo import đúng đường dẫn cho các lớp sau:
 import com.example.sereincandle.adapter.ProductAdapter; // Sửa tên package nếu cần
+import com.example.sereincandle.models.CartItemRequest;
 import com.example.sereincandle.models.Product; // Sửa tên package nếu cần
 import com.example.sereincandle.models.ProductListResponse; // Sửa tên package nếu cần
 import com.example.sereincandle.network.ApiService;
@@ -25,7 +26,8 @@ import retrofit2.Response;
 
 // Triển khai interface OnProductClickListener
 public class ProductListActivity extends AppCompatActivity
-        implements ProductAdapter.OnProductClickListener {
+        implements ProductAdapter.OnProductClickListener,
+        ProductAdapter.OnAddToCartClickListener {
 
     private RecyclerView rvProducts;
     private ProductAdapter adapter;
@@ -36,19 +38,48 @@ public class ProductListActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_list);
 
-        // 1. Ánh xạ và Thiết lập RecyclerView
         rvProducts = findViewById(R.id.rvProducts);
         productList = new ArrayList<>();
 
-        // CẬP NHẬT: Truyền 'this' (listener) vào Adapter
-        adapter = new ProductAdapter(this, productList, this);
+        // CẬP NHẬT: Truyền 'this' (listener) cho cả hai tham số
+        adapter = new ProductAdapter(this, productList, this, this);
         rvProducts.setLayoutManager(new LinearLayoutManager(this));
         rvProducts.setAdapter(adapter);
 
-        // 2. Gọi API để tải sản phẩm
         fetchProducts();
     }
+    @Override
+    public void onAddToCartClick(int productId) {
+        addItemToCart(productId, 1); // Thêm 1 sản phẩm
+    }
 
+    private void addItemToCart(int productId, int quantity) {
+        // Tạo request body
+        CartItemRequest request = new CartItemRequest(productId, quantity);
+
+        // Khởi tạo service (sẽ tự động thêm token)
+        ApiService apiService = ServiceGenerator.createService(ApiService.class);
+        Call<Void> call = apiService.addItemToCart(request);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(ProductListActivity.this, "Đã thêm sản phẩm ID " + productId + " vào giỏ hàng!", Toast.LENGTH_SHORT).show();
+                } else if (response.code() == 401) {
+                    Toast.makeText(ProductListActivity.this, "Lỗi: Vui lòng đăng nhập lại (Token hết hạn)!", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(ProductListActivity.this, "Lỗi thêm giỏ hàng: Mã " + response.code(), Toast.LENGTH_LONG).show();
+                    Log.e("CART_API_ERROR", "Phản hồi lỗi: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(ProductListActivity.this, "Lỗi kết nối khi thêm giỏ hàng: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
     /**
      * Phương thức triển khai từ OnProductClickListener (Xử lý khi nhấp vào sản phẩm)
      * @param productId ID của sản phẩm được nhấp vào
