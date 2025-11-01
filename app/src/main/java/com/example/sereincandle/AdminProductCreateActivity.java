@@ -71,6 +71,10 @@ public class AdminProductCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_product_create);
 
+        // Setup nút Back
+        ImageView btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
+
         // Khởi tạo
         selectedImageUris = new ArrayList<>();
         apiService = ServiceGenerator.createService(ApiService.class);

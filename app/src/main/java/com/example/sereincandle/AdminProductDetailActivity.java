@@ -31,7 +31,7 @@ import retrofit2.Response;
 
 public class AdminProductDetailActivity extends AppCompatActivity {
 
-    private ImageView ivProductImage;
+    private ImageView ivProductImage, btnBack;
     private EditText etProductName, etSku, etShortDescription, etDescription, 
                      etIngredients, etBurnTime, etPrice;
     private Spinner spCategory;
@@ -48,6 +48,10 @@ public class AdminProductDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_product_detail);
+
+        // Setup nút Back
+        btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
 
         // Lấy productId từ Intent
         if (getIntent().getExtras() != null) {

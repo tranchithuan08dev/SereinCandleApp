@@ -30,6 +30,10 @@ public class ProductDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product_detail);
 
+        // Setup nút Back
+        ImageView btnBack = findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(v -> finish());
+
         // 1. Ánh xạ View
         ivDetailImage = findViewById(R.id.ivDetailImage);
         tvDetailName = findViewById(R.id.tvDetailName);

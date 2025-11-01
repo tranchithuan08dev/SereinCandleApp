@@ -6,7 +6,20 @@
     android:orientation="vertical"
     tools:context=".CartActivity">
 
-    <TextView
+        <!-- Nút Back -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_back_button"
+            android:background="@drawable/btn_back_background"
+            android:padding="16dp"
+            android:layout_margin="8dp"
+            android:contentDescription="Quay lại"
+            android:clickable="true"
+            android:focusable="true" />
+
+        <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
