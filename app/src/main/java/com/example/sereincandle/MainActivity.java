@@ -15,6 +15,7 @@ import com.example.sereincandle.network.ApiService;
 import com.example.sereincandle.network.ServiceGenerator; // Cần import ServiceGenerator
 import com.example.sereincandle.LoginRequest; // Đảm bảo import model LoginRequest
 import com.example.sereincandle.LoginResponse; // Đảm bảo import model LoginResponse
+import com.example.sereincandle.utils.SessionManager; // Import SessionManager
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -26,7 +27,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
-    private Button btnLogin;
+    private Button btnLogin, btnRegister;
     private TextView tvMessage;
 
     @Override
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        btnRegister = findViewById(R.id.btnRegister);
         tvMessage = findViewById(R.id.tvMessage);
 
         // 2. Thiết lập sự kiện lắng nghe cho nút Đăng nhập
@@ -49,6 +51,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 performLogin();
+            }
+        });
+
+        // 3. Thiết lập sự kiện lắng nghe cho nút Đăng ký
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -87,21 +98,33 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
 
-                    // Giả sử hàm lấy Token là getToken() hoặc getAccessToken()
-                    // Dựa trên mã trước đó, tôi dùng getToken()
+                    // Lấy token và user data
                     String token = loginResponse.getToken();
+                    UserData userData = loginResponse.getData();
 
                     if (token != null && !token.isEmpty()) {
-                        // **THÀNH CÔNG:** Lưu Token JWT vào SharedPreferences
-                        SharedPreferences sharedPref = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("JWT_TOKEN", token);
-                        editor.apply();
+                        // **THÀNH CÔNG:** Lưu thông tin vào SessionManager
+                        SessionManager sessionManager = new SessionManager(MainActivity.this);
+                        sessionManager.saveToken(token);
+
+                        // Lưu thông tin user (role, name, email)
+                        if (userData != null) {
+                            sessionManager.saveRole(userData.getRoleName());
+                            sessionManager.saveUserName(userData.getFullName());
+                            sessionManager.saveUserEmail(userData.getEmail());
+                        }
 
                         tvMessage.setText(""); // Xóa thông báo
 
-                        // Chuyển sang Activity Trang chủ
-                        Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
+                        // Điều hướng theo role
+                        Intent intent;
+                        if (userData != null && "Admin".equalsIgnoreCase(userData.getRoleName())) {
+                            // Admin → AdminHomeActivity
+                            intent = new Intent(MainActivity.this, AdminHomeActivity.class);
+                        } else {
+                            // Customer → HomePageActivity (như cũ)
+                            intent = new Intent(MainActivity.this, HomePageActivity.class);
+                        }
                         startActivity(intent);
 
                         // Kết thúc màn hình đăng nhập

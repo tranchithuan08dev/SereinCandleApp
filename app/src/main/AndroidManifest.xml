@@ -30,6 +30,27 @@
             android:name=".HomePageActivity"
             android:exported="false" />
         <activity
+            android:name=".AdminHomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminProductListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminProductDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminProductCreateActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminOrderListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminOrderDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

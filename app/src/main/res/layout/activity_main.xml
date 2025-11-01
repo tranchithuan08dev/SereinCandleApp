@@ -4,34 +4,108 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center_vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#F8F9FA"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/etEmail"
+    <!-- Logo/Title SEREINCANDLE -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:padding="12dp"
-        android:layout_marginBottom="16dp"/>
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="50dp">
 
-    <EditText
-        android:id="@+id/etPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Mật khẩu"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:layout_marginBottom="24dp"/>
+        <!-- Logo Icon -->
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_candle_logo"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Serein Candle Logo"/>
 
-    <Button
-        android:id="@+id/btnLogin"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SEREINCANDLE"
+            android:textSize="42sp"
+            android:textStyle="bold"
+            android:textColor="#8B4513"
+            android:letterSpacing="0.1"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thắp sáng không gian của bạn"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:textStyle="italic"/>
+
+    </LinearLayout>
+
+    <!-- Login Form -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ĐĂNG NHẬP"
-        android:padding="12dp"/>
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:padding="24dp"
+        android:elevation="4dp">
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:drawable/edit_text"
+            android:textSize="16sp"/>
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mật khẩu"
+            android:inputType="textPassword"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:background="@android:drawable/edit_text"
+            android:textSize="16sp"/>
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ĐĂNG NHẬP"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:padding="16dp"
+            android:backgroundTint="#8B4513"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ĐĂNG KÝ"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:padding="16dp"
+            android:backgroundTint="#FFFFFF"
+            android:textColor="#8B4513"
+            android:background="@android:drawable/dialog_holo_light_frame"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvMessage"
@@ -39,7 +113,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textColor="#FF0000"
-        android:textSize="16sp"
-        android:text=""/>
+        android:textSize="14sp"
+        android:text=""
+        android:gravity="center"/>
 
 </LinearLayout>
