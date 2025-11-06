@@ -77,8 +77,7 @@ public class AdminOrderListActivity extends AppCompatActivity {
                         ", Items=" + (order.getItems() != null ? order.getItems().size() : 0));
                 startActivity(intent);
             } catch (Exception e) {
-                Log.e("ORDER_NAVIGATION", "Error passing Order to detail: " + e.getMessage());
-                e.printStackTrace();
+                Log.e("ORDER_NAVIGATION", "Error passing Order to detail: " + e.getMessage(), e);
                 Toast.makeText(AdminOrderListActivity.this, 
                         "Lỗi khi mở chi tiết đơn hàng: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -101,9 +100,7 @@ public class AdminOrderListActivity extends AppCompatActivity {
         });
 
         // Pull to refresh
-        swipeRefresh.setOnRefreshListener(() -> {
-            loadOrders();
-        });
+        swipeRefresh.setOnRefreshListener(this::loadOrders);
 
         // Load danh sách đơn hàng
         loadOrders();
@@ -139,8 +136,10 @@ public class AdminOrderListActivity extends AppCompatActivity {
                     // Log error body nếu có
                     try {
                         if (response.errorBody() != null) {
-                            String errorBody = response.errorBody().string();
-                            Log.e("API_ERROR", "Error body: " + errorBody);
+                            try (okhttp3.ResponseBody errorBody = response.errorBody()) {
+                                String errorBodyString = errorBody.string();
+                                Log.e("API_ERROR", "Error body: " + errorBodyString);
+                            }
                         }
                     } catch (Exception e) {
                         Log.e("API_ERROR", "Error reading error body: " + e.getMessage());

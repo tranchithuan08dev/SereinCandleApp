@@ -1,10 +1,15 @@
 package com.example.sereincandle.models;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Model cho attributes của sản phẩm khi tạo/cập nhật
  */
 public class ProductAttributeValue {
+    @SerializedName("AttributeId")
     private int attributeId;  // required
+    
+    @SerializedName("Value")
     private String value;     // required
 
     public ProductAttributeValue() {

@@ -33,18 +33,29 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        
+        try {
+            Log.d("MainActivity", "onCreate: Starting...");
+            setContentView(R.layout.activity_main);
+            Log.d("MainActivity", "onCreate: Layout set successfully");
 
-        // 🔑 BƯỚC QUAN TRỌNG: Khởi tạo ServiceGenerator với Context của ứng dụng
-        // Điều này cho phép ServiceGenerator đọc Token từ SharedPreferences
-        ServiceGenerator.init(getApplicationContext());
+            // 🔑 BƯỚC QUAN TRỌNG: Khởi tạo ServiceGenerator với Context của ứng dụng
+            // Điều này cho phép ServiceGenerator đọc Token từ SharedPreferences
+            try {
+                ServiceGenerator.init(getApplicationContext());
+                Log.d("MainActivity", "onCreate: ServiceGenerator initialized");
+            } catch (Exception e) {
+                Log.e("MainActivity", "Error initializing ServiceGenerator: " + e.getMessage(), e);
+                // Không throw, tiếp tục để app không crash
+            }
 
-        // 1. Ánh xạ các thành phần UI
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnRegister = findViewById(R.id.btnRegister);
-        tvMessage = findViewById(R.id.tvMessage);
+            // 1. Ánh xạ các thành phần UI
+            etEmail = findViewById(R.id.etEmail);
+            etPassword = findViewById(R.id.etPassword);
+            btnLogin = findViewById(R.id.btnLogin);
+            btnRegister = findViewById(R.id.btnRegister);
+            tvMessage = findViewById(R.id.tvMessage);
+            Log.d("MainActivity", "onCreate: UI components initialized");
 
         // 2. Thiết lập sự kiện lắng nghe cho nút Đăng nhập
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +73,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        
+        Log.d("MainActivity", "onCreate: Completed successfully");
+        } catch (Exception e) {
+            Log.e("MainActivity", "FATAL ERROR in onCreate: " + e.getMessage(), e);
+            // Hiển thị lỗi cho user
+            if (tvMessage != null) {
+                tvMessage.setText("Lỗi khởi động ứng dụng: " + e.getMessage());
+            }
+            // Không finish() để có thể debug
+        }
     }
 
     /**

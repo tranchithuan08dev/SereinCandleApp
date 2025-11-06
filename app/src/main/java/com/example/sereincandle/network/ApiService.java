@@ -72,15 +72,23 @@ public interface ApiService {
     /**
      * Tạo sản phẩm mới (Admin only - multipart/form-data)
      * Content-Type: multipart/form-data
-     * Form fields:
-     *   - productDto: JSON string của ProductRequest
+     * Form fields (theo tài liệu BE):
+     *   - Name, SKU, ShortDescription, Description, Ingredients, BurnTime, Price, CategoryId
+     *   - Attributes[0].AttributeId, Attributes[0].Value (nếu có)
      *   - images: Multiple image files
      */
     @Multipart
     @POST("Product")
     Call<ProductDetailResponse> createProduct(
-            @Part("productDto") RequestBody productDtoJson,  // JSON string của ProductRequest
-            @Part List<MultipartBody.Part> images              // Multiple images
+            @Part("Name") RequestBody name,
+            @Part("Description") RequestBody description,
+            @Part("Price") RequestBody price,
+            @Part("CategoryId") RequestBody categoryId,
+            @Part("SKU") RequestBody sku,
+            @Part("ShortDescription") RequestBody shortDescription,
+            @Part("Ingredients") RequestBody ingredients,
+            @Part("BurnTime") RequestBody burnTime,
+            @Part List<MultipartBody.Part> images  // Multiple images
     );
 
     /**

@@ -17,12 +17,28 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Tối ưu cho debug build
+            isMinifyEnabled = false
+            isDebuggable = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+    }
+    
+    // Tối ưu build
+    buildFeatures {
+        buildConfig = true
+    }
+    
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
     compileOptions {

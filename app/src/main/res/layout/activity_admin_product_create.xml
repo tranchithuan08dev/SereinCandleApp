@@ -86,8 +86,11 @@
             android:id="@+id/etProductName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập tên sản phẩm"
+            android:hint="Ví dụ: Nến thơm hoa oải hương"
             android:padding="12dp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:maxLines="2"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -100,8 +103,10 @@
             android:id="@+id/etSku"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập SKU"
+            android:hint="Ví dụ: CANDLE-LAV-001 (Tùy chọn)"
             android:padding="12dp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -114,8 +119,11 @@
             android:id="@+id/etShortDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập mô tả ngắn"
+            android:hint="Ví dụ: Nến thơm tự nhiên, thời gian cháy 40 giờ (Tùy chọn)"
             android:padding="12dp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:maxLines="2"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -128,10 +136,13 @@
             android:id="@+id/etDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập mô tả chi tiết"
+            android:hint="Mô tả chi tiết về sản phẩm, công dụng, cách sử dụng... (Bắt buộc)"
             android:padding="12dp"
+            android:inputType="textMultiLine|text"
+            android:imeOptions="actionNext"
             android:minLines="3"
-            android:gravity="top"
+            android:gravity="top|start"
+            android:scrollbars="vertical"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -144,8 +155,11 @@
             android:id="@+id/etIngredients"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập thành phần"
+            android:hint="Ví dụ: Sáp đậu nành, tinh dầu oải hương, bấc cotton (Tùy chọn)"
             android:padding="12dp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
+            android:maxLines="2"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -158,8 +172,10 @@
             android:id="@+id/etBurnTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập thời gian cháy"
+            android:hint="Ví dụ: 40 giờ, 50 giờ (Tùy chọn)"
             android:padding="12dp"
+            android:inputType="text"
+            android:imeOptions="actionNext"
             android:layout_marginBottom="12dp" />
 
         <TextView
@@ -172,8 +188,9 @@
             android:id="@+id/etPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nhập giá"
+            android:hint="Ví dụ: 250000 (đơn vị: VNĐ, Bắt buộc)"
             android:inputType="numberDecimal"
+            android:imeOptions="actionDone"
             android:padding="12dp"
             android:layout_marginBottom="12dp" />
 
@@ -198,14 +215,29 @@
             android:checked="true"
             android:layout_marginBottom="16dp" />
 
-        <Button
-            android:id="@+id/btnCreateProduct"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tạo sản phẩm"
-            android:textSize="16sp"
-            android:padding="15dp"
-            android:layout_marginBottom="16dp" />
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+            
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone" />
+            
+            <Button
+                android:id="@+id/btnCreateProduct"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tạo sản phẩm"
+                android:textSize="16sp"
+                android:padding="15dp" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/btnCancel"

@@ -1,20 +1,39 @@
 package com.example.sereincandle.models;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
  * Model để tạo/cập nhật sản phẩm
  * Mapping với Backend: InsertProductDto
+ * Backend sử dụng PascalCase (Name, Description) nên cần @SerializedName
  */
 public class ProductRequest {
+    @SerializedName("Name")
     private String name;              // required
+    
+    @SerializedName("SKU")
     private String sku;               // optional
+    
+    @SerializedName("ShortDescription")
     private String shortDescription;  // optional
+    
+    @SerializedName("Description")
     private String description;       // required
+    
+    @SerializedName("Ingredients")
     private String ingredients;       // optional
+    
+    @SerializedName("BurnTime")
     private String burnTime;          // optional
+    
+    @SerializedName("Price")
     private double price;             // required (decimal)
+    
+    @SerializedName("CategoryId")
     private int categoryId;           // required
+    
+    @SerializedName("Attributes")
     private List<ProductAttributeValue> attributes;  // optional
 
     // Constructors

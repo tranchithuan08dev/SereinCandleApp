@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -55,6 +56,7 @@ public class AdminProductCreateActivity extends AppCompatActivity {
     private Spinner spCategory;
     private CheckBox cbIsActive;
     private RecyclerView rvSelectedImages;
+    private ProgressBar progressBar;
 
     private List<Uri> selectedImageUris;
     private SelectedImagesAdapter imagesAdapter;
@@ -96,6 +98,7 @@ public class AdminProductCreateActivity extends AppCompatActivity {
         spCategory = findViewById(R.id.spCategory);
         cbIsActive = findViewById(R.id.cbIsActive);
         rvSelectedImages = findViewById(R.id.rvSelectedImages);
+        progressBar = findViewById(R.id.progressBar);
 
         // Setup RecyclerView cho selected images
         imagesAdapter = new SelectedImagesAdapter(selectedImageUris, this::removeImage);
@@ -164,68 +167,211 @@ public class AdminProductCreateActivity extends AppCompatActivity {
     }
 
     private boolean validateForm() {
-        if (etProductName.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập tên sản phẩm", Toast.LENGTH_SHORT).show();
-            return false;
+        boolean isValid = true;
+        
+        // Xóa tất cả lỗi cũ
+        clearAllErrors();
+        
+        // 1. Kiểm tra Tên sản phẩm (Bắt buộc)
+        String productName = etProductName.getText().toString().trim();
+        if (productName.isEmpty()) {
+            etProductName.setError("Tên sản phẩm không được để trống");
+            etProductName.requestFocus();
+            isValid = false;
+        } else if (productName.length() < 3) {
+            etProductName.setError("Tên sản phẩm phải có ít nhất 3 ký tự");
+            etProductName.requestFocus();
+            isValid = false;
+        } else if (productName.length() > 200) {
+            etProductName.setError("Tên sản phẩm không được vượt quá 200 ký tự");
+            etProductName.requestFocus();
+            isValid = false;
         }
-        if (etDescription.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập mô tả", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        if (etPrice.getText().toString().trim().isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập giá", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-        try {
-            double price = Double.parseDouble(etPrice.getText().toString().trim());
-            if (price < 0) {
-                Toast.makeText(this, "Giá không được âm", Toast.LENGTH_SHORT).show();
-                return false;
+        
+        // 2. Kiểm tra Mô tả chi tiết (Bắt buộc)
+        String description = etDescription.getText().toString().trim();
+        if (description.isEmpty()) {
+            etDescription.setError("Mô tả chi tiết không được để trống");
+            if (isValid) {
+                etDescription.requestFocus();
             }
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Giá không hợp lệ", Toast.LENGTH_SHORT).show();
-            return false;
+            isValid = false;
+        } else if (description.length() < 10) {
+            etDescription.setError("Mô tả chi tiết phải có ít nhất 10 ký tự");
+            if (isValid) {
+                etDescription.requestFocus();
+            }
+            isValid = false;
         }
+        
+        // 3. Kiểm tra Giá (Bắt buộc)
+        String priceText = etPrice.getText().toString().trim();
+        if (priceText.isEmpty()) {
+            etPrice.setError("Giá không được để trống");
+            if (isValid) {
+                etPrice.requestFocus();
+            }
+            isValid = false;
+        } else {
+            try {
+                double price = Double.parseDouble(priceText);
+                if (price < 0) {
+                    etPrice.setError("Giá không được âm");
+                    if (isValid) {
+                        etPrice.requestFocus();
+                    }
+                    isValid = false;
+                } else if (price == 0) {
+                    etPrice.setError("Giá phải lớn hơn 0");
+                    if (isValid) {
+                        etPrice.requestFocus();
+                    }
+                    isValid = false;
+                } else if (price > 100000000) {
+                    etPrice.setError("Giá không được vượt quá 100,000,000 VNĐ");
+                    if (isValid) {
+                        etPrice.requestFocus();
+                    }
+                    isValid = false;
+                }
+            } catch (NumberFormatException e) {
+                etPrice.setError("Giá không hợp lệ. Vui lòng nhập số (ví dụ: 250000)");
+                if (isValid) {
+                    etPrice.requestFocus();
+                }
+                isValid = false;
+            }
+        }
+        
+        // 4. Kiểm tra Danh mục (Bắt buộc)
         if (spCategory.getSelectedItem() == null) {
-            Toast.makeText(this, "Vui lòng chọn danh mục", Toast.LENGTH_SHORT).show();
-            return false;
+            Toast.makeText(this, "Vui lòng chọn danh mục sản phẩm", Toast.LENGTH_LONG).show();
+            isValid = false;
         }
-        // Ảnh không bắt buộc - có thể để trống để test
-        // if (selectedImageUris.isEmpty()) {
-        //     Toast.makeText(this, "Vui lòng chọn ít nhất một ảnh", Toast.LENGTH_SHORT).show();
-        //     return false;
-        // }
+        
+        // 5. Cảnh báo về ảnh (không bắt buộc)
         if (selectedImageUris.isEmpty()) {
             // Chỉ cảnh báo, không chặn
-            Toast.makeText(this, "Cảnh báo: Sản phẩm chưa có ảnh. Bạn có thể thêm ảnh sau.", 
+            Toast.makeText(this, "⚠️ Cảnh báo: Sản phẩm chưa có ảnh. Bạn có thể thêm ảnh sau.", 
                     Toast.LENGTH_LONG).show();
         }
-        return true;
+        
+        // Hiển thị tổng hợp lỗi nếu có
+        if (!isValid) {
+            Toast.makeText(this, "Vui lòng sửa các lỗi được đánh dấu ở trên", Toast.LENGTH_LONG).show();
+        }
+        
+        return isValid;
+    }
+    
+    /**
+     * Xóa tất cả lỗi hiển thị trên các trường input
+     */
+    private void clearAllErrors() {
+        etProductName.setError(null);
+        etSku.setError(null);
+        etShortDescription.setError(null);
+        etDescription.setError(null);
+        etIngredients.setError(null);
+        etBurnTime.setError(null);
+        etPrice.setError(null);
     }
 
     private void createProduct() {
+        // Disable button và hiển thị loading
+        btnCreateProduct.setEnabled(false);
+        btnCancel.setEnabled(false);
+        progressBar.setVisibility(View.VISIBLE);
+        
         // Tạo ProductRequest từ form
         ProductRequest request = new ProductRequest();
         request.setName(etProductName.getText().toString().trim());
-        request.setSku(etSku.getText().toString().trim());
-        request.setShortDescription(etShortDescription.getText().toString().trim());
+        
+        // Chỉ set các field optional nếu có giá trị
+        String sku = etSku.getText().toString().trim();
+        if (!sku.isEmpty()) {
+            request.setSku(sku);
+        }
+        
+        String shortDesc = etShortDescription.getText().toString().trim();
+        if (!shortDesc.isEmpty()) {
+            request.setShortDescription(shortDesc);
+        }
+        
         request.setDescription(etDescription.getText().toString().trim());
-        request.setIngredients(etIngredients.getText().toString().trim());
-        request.setBurnTime(etBurnTime.getText().toString().trim());
+        
+        String ingredients = etIngredients.getText().toString().trim();
+        if (!ingredients.isEmpty()) {
+            request.setIngredients(ingredients);
+        }
+        
+        String burnTime = etBurnTime.getText().toString().trim();
+        if (!burnTime.isEmpty()) {
+            request.setBurnTime(burnTime);
+        }
+        
         request.setPrice(Double.parseDouble(etPrice.getText().toString().trim()));
         
         Category selectedCategory = (Category) spCategory.getSelectedItem();
         request.setCategoryId(selectedCategory.getCategoryId());
+        
+        Log.d("CREATE_PRODUCT", "Creating product: " + request.getName());
 
-        // Convert ProductRequest thành JSON string
-        String productDtoJson = gson.toJson(request);
-        RequestBody productDtoBody = RequestBody.create(
-                MediaType.parse("application/json"),
-                productDtoJson
+        // Tạo RequestBody cho từng field riêng lẻ (theo tài liệu BE - FormData)
+        // Backend C# nhận FormData với các field riêng lẻ, không phải JSON string
+        
+        // Required fields
+        RequestBody nameBody = RequestBody.create(
+                MediaType.parse("text/plain"),
+                request.getName() != null ? request.getName() : ""
         );
+        
+        RequestBody descriptionBody = RequestBody.create(
+                MediaType.parse("text/plain"),
+                request.getDescription() != null ? request.getDescription() : ""
+        );
+        
+        RequestBody priceBody = RequestBody.create(
+                MediaType.parse("text/plain"),
+                String.valueOf(request.getPrice())
+        );
+        
+        RequestBody categoryIdBody = RequestBody.create(
+                MediaType.parse("text/plain"),
+                String.valueOf(request.getCategoryId())
+        );
+        
+        // Optional fields - luôn gửi, dùng empty string nếu không có giá trị
+        // Retrofit @Part không hỗ trợ required = false, nên phải luôn gửi
+        RequestBody skuBody = RequestBody.create(
+                MediaType.parse("text/plain"),
+                request.getSku() != null ? request.getSku() : ""
+        );
+        
+        RequestBody shortDescBody = RequestBody.create(
+                MediaType.parse("text/plain"),
+                request.getShortDescription() != null ? request.getShortDescription() : ""
+        );
+        
+        RequestBody ingredientsBody = RequestBody.create(
+                MediaType.parse("text/plain"),
+                request.getIngredients() != null ? request.getIngredients() : ""
+        );
+        
+        RequestBody burnTimeBody = RequestBody.create(
+                MediaType.parse("text/plain"),
+                request.getBurnTime() != null ? request.getBurnTime() : ""
+        );
+        
+        Log.d("CREATE_PRODUCT", "Form fields: Name=" + request.getName() + 
+                ", Description=" + request.getDescription() + 
+                ", Price=" + request.getPrice() + 
+                ", CategoryId=" + request.getCategoryId());
 
         // Tạo MultipartBody.Part từ các Uri ảnh
         List<MultipartBody.Part> imageParts = new ArrayList<>();
+        Log.d("CREATE_PRODUCT", "Processing " + selectedImageUris.size() + " images");
+        
         for (Uri imageUri : selectedImageUris) {
             try {
                 // Đọc file từ Uri
@@ -256,49 +402,95 @@ public class AdminProductCreateActivity extends AppCompatActivity {
                             requestFile
                     );
                     imageParts.add(imagePart);
+                    Log.d("CREATE_PRODUCT", "Added image: " + tempFile.getName());
                 }
             } catch (Exception e) {
-                Log.e("IMAGE_ERROR", "Error processing image: " + e.getMessage());
+                Log.e("IMAGE_ERROR", "Error processing image: " + e.getMessage(), e);
+                Toast.makeText(this, "Lỗi xử lý ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
 
         // Nếu không có ảnh, vẫn có thể tạo sản phẩm (backend sẽ xử lý)
-        // Hoặc có thể tạo một empty part để đảm bảo API không lỗi
         if (imageParts.isEmpty()) {
             Log.w("IMAGE_WARNING", "Creating product without images");
-            // Có thể thêm một empty part nếu backend yêu cầu
-            // Hoặc để trống và để backend xử lý
         }
 
-        // Gọi API
-        Call<ProductDetailResponse> call = apiService.createProduct(productDtoBody, imageParts);
+        // Gọi API với các form fields riêng lẻ
+        Log.d("CREATE_PRODUCT", "Calling API with " + imageParts.size() + " images");
+        Call<ProductDetailResponse> call = apiService.createProduct(
+                nameBody,
+                descriptionBody,
+                priceBody,
+                categoryIdBody,
+                skuBody,
+                shortDescBody,
+                ingredientsBody,
+                burnTimeBody,
+                imageParts
+        );
         call.enqueue(new Callback<ProductDetailResponse>() {
             @Override
             public void onResponse(Call<ProductDetailResponse> call, Response<ProductDetailResponse> response) {
-                if (response.isSuccessful()) {
+                // Enable lại button và ẩn loading
+                btnCreateProduct.setEnabled(true);
+                btnCancel.setEnabled(true);
+                progressBar.setVisibility(View.GONE);
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    ProductDetailResponse productResponse = response.body();
+                    if (productResponse.getData() != null) {
+                        Log.d("CREATE_PRODUCT", "Product created successfully: ID=" + productResponse.getData().getProductId() + ", Name=" + productResponse.getData().getName());
+                    } else {
+                        Log.d("CREATE_PRODUCT", "Product created successfully (no data in response)");
+                    }
                     Toast.makeText(AdminProductCreateActivity.this, 
-                            "Tạo sản phẩm thành công", Toast.LENGTH_SHORT).show();
+                            "Tạo sản phẩm thành công!", Toast.LENGTH_SHORT).show();
                     finish(); // Quay lại danh sách
                 } else {
-                    Toast.makeText(AdminProductCreateActivity.this, 
-                            "Không thể tạo sản phẩm", Toast.LENGTH_SHORT).show();
+                    String errorMessage = "Không thể tạo sản phẩm";
                     Log.e("API_ERROR", "Error code: " + response.code());
                     try {
                         if (response.errorBody() != null) {
                             String errorBody = response.errorBody().string();
                             Log.e("API_ERROR", "Error body: " + errorBody);
+                            
+                            // Cố gắng parse error message từ JSON
+                            if (errorBody.contains("message") || errorBody.contains("Message")) {
+                                errorMessage = "Lỗi: " + errorBody;
+                            }
                         }
                     } catch (Exception e) {
                         Log.e("API_ERROR", "Error reading error body: " + e.getMessage());
                     }
+                    
+                    // Hiển thị thông báo lỗi chi tiết hơn
+                    if (response.code() == 400) {
+                        errorMessage = "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.";
+                    } else if (response.code() == 401) {
+                        errorMessage = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+                    } else if (response.code() == 403) {
+                        errorMessage = "Bạn không có quyền thực hiện thao tác này.";
+                    } else if (response.code() >= 500) {
+                        errorMessage = "Lỗi server. Vui lòng thử lại sau.";
+                    }
+                    
+                    Toast.makeText(AdminProductCreateActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<ProductDetailResponse> call, Throwable t) {
-                Toast.makeText(AdminProductCreateActivity.this, 
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("NETWORK_ERROR", "Error: " + t.getMessage());
+                // Enable lại button và ẩn loading
+                btnCreateProduct.setEnabled(true);
+                btnCancel.setEnabled(true);
+                progressBar.setVisibility(View.GONE);
+                
+                String errorMsg = "Lỗi kết nối";
+                if (t.getMessage() != null) {
+                    errorMsg += ": " + t.getMessage();
+                }
+                Toast.makeText(AdminProductCreateActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                Log.e("NETWORK_ERROR", "Error creating product", t);
             }
         });
     }
